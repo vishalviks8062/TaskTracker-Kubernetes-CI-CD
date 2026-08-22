@@ -1,6 +1,6 @@
 <header class="topbar" *ngIf="auth.isLoggedIn()">
   <span class="brand">TaskTracker</span>
-  <span class="tagline">Organize brilliantly</span>
+  <!-- <span class="tagline">Organize brilliantly</span> -->
   <span class="user">{{ auth.username() }}</span>
   <button (click)="logout()">Log out</button>
 </header>
