@@ -1,0 +1,58 @@
+# Runs Postgres as a single-replica Deployment, as requested. Good enough
+# for learning, but worth knowing why it's not how you'd run a real
+# production database: a Deployment gives Pods no stable identity, and if
+# you ever bumped replicas above 1 here you'd get multiple independent
+# Postgres processes writing to the same disk and corrupting it (that's
+# what StatefulSets exist to solve properly). In production you'd usually
+# reach for a StatefulSet, an operator (e.g. CloudNativePG), or a managed
+# database service outside the cluster (e.g. Azure Database for
+# PostgreSQL) instead.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: tasktracker-config
+                  key: DB_NAME
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: tasktracker-db-secret
+                  key: DB_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: tasktracker-db-secret
+                  key: DB_PASSWORD
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata   # a subdirectory, not the mount root — avoids clashing with lost+found on a fresh volume
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "$(POSTGRES_USER)"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-pvc

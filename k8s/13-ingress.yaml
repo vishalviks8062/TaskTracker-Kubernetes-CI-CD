@@ -1,0 +1,38 @@
+# The single public entry point for the app, replacing frontend-service's
+# old LoadBalancer. nip.io is a free wildcard DNS service that resolves
+# any "<ip-with-dashes>.nip.io" straight back to that IP — a standard
+# trick for getting a real hostname (which Let's Encrypt requires; it
+# won't issue certs for bare IPs) without owning a domain. The frontend
+# Pod's own nginx still handles the /api -> backend-service proxying
+# internally, so this Ingress only needs one rule.
+#
+# The cert-manager.io/cluster-issuer annotation is what wires this
+# Ingress to 12-cluster-issuer.yaml: cert-manager watches for that
+# annotation, requests a certificate for the host below, completes the
+# HTTP-01 challenge automatically, and writes the result into the
+# tasktracker-tls Secret named under tls.secretName. ingress-nginx then
+# terminates HTTPS using that Secret and redirects plain HTTP to HTTPS
+# automatically whenever a tls block is present.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tasktracker-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - 20-7-92-92.nip.io
+      secretName: tasktracker-tls
+  rules:
+    - host: 20-7-92-92.nip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-service
+                port:
+                  number: 80

@@ -1,0 +1,77 @@
+# The API tier: 2 replicas for availability. resources.requests/limits are
+# set because the HorizontalPodAutoscaler (08-backend-hpa.yaml) computes
+# "% CPU used" against requests.cpu — without a request, the HPA has
+# nothing to measure against. livenessProbe and readinessProbe both hit
+# GET /health but serve different purposes: liveness failing gets the Pod
+# restarted (it's stuck); readiness failing just pulls the Pod out of the
+# Service's endpoints until it passes again (it's not stuck, just not
+# ready for traffic yet, e.g. still starting up).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: kubecontainer01.azurecr.io/tasktracker-b:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: tasktracker-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: tasktracker-config
+                  key: DB_PORT
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: tasktracker-config
+                  key: DB_NAME
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: tasktracker-db-secret
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: tasktracker-db-secret
+                  key: DB_PASSWORD
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: tasktracker-jwt-secret
+                  key: JWT_SECRET
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 20   # give the JVM + Spring context time to boot before the first check
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5

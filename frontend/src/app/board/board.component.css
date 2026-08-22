@@ -1,0 +1,52 @@
+.board-wrap {
+  padding: 24px;
+}
+
+.board-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.board-header h1 {
+  margin: 0;
+}
+
+.add-bucket-form {
+  display: flex;
+  gap: 8px;
+}
+
+.add-bucket-form input {
+  padding: 8px;
+  border: 1px solid #cbd2d9;
+  border-radius: 4px;
+  min-width: 220px;
+}
+
+.add-bucket-form button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 4px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+}
+
+.board {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.error {
+  color: #e12d39;
+}
+
+.empty {
+  color: #52606d;
+}

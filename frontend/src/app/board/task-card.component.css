@@ -1,0 +1,52 @@
+.card {
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.card-top h3 {
+  flex: 1;
+  margin: 0;
+  font-size: 0.95rem;
+  word-break: break-word;
+}
+
+.card.done h3 {
+  text-decoration: line-through;
+  color: #9aa5b1;
+}
+
+.description {
+  margin: 6px 0 8px;
+  font-size: 0.85rem;
+  color: #52606d;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.bucket-select {
+  width: 100%;
+  padding: 4px;
+  font-size: 0.8rem;
+  border: 1px solid #e4e7eb;
+  border-radius: 4px;
+  background: #f8f9fa;
+}
+
+.remove {
+  border: none;
+  background: none;
+  color: #e12d39;
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0;
+}

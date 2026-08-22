@@ -1,0 +1,14 @@
+# ClusterIP (the default Service type when none is specified): reachable
+# only from inside the cluster, which is exactly right — nothing outside
+# the cluster should ever be able to connect to the database directly.
+# Other Pods reach it at "postgres-service:5432" (Kubernetes' internal DNS).
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+spec:
+  selector:
+    app: postgres
+  ports:
+    - port: 5432
+      targetPort: 5432

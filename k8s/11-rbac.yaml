@@ -1,0 +1,36 @@
+# Demonstrates least-privilege access control. Nothing in this project
+# actually uses this ServiceAccount yet — it exists so you can practice:
+#   kubectl auth can-i list pods --as=system:serviceaccount:default:task-viewer
+#   kubectl auth can-i delete pods --as=system:serviceaccount:default:task-viewer
+# (the first should say "yes", the second "no"), or attach it to a test
+# Pod's spec.serviceAccountName and curl the Kubernetes API from inside it.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: task-viewer
+---
+# A Role is namespace-scoped (only grants access within this namespace);
+# a ClusterRole would be the equivalent for cluster-wide resources/access.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pod-reader
+rules:
+  - apiGroups: [""]          # "" is the core API group (Pods, Services, ConfigMaps, Secrets, etc.)
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]   # read-only — no create/update/delete
+---
+# Binds the Role to the ServiceAccount. Roles and ServiceAccounts grant
+# nothing by themselves; a RoleBinding (or ClusterRoleBinding) is what
+# actually connects "who" to "what they're allowed to do".
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: task-viewer-pod-reader
+subjects:
+  - kind: ServiceAccount
+    name: task-viewer
+roleRef:
+  kind: Role
+  name: pod-reader
+  apiGroup: rbac.authorization.k8s.io

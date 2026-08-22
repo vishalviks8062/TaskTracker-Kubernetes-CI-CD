@@ -1,0 +1,16 @@
+# ClusterIP now, not LoadBalancer: the ingress-nginx controller (installed
+# separately, see 12-ingress.yaml) is the one public entry point for
+# everything in the cluster, terminating TLS and forwarding to whichever
+# Service matches the request's host/path. That means only ONE Azure
+# Public IP is paid for no matter how many apps/Services you add later,
+# instead of one per LoadBalancer-type Service.
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+spec:
+  selector:
+    app: frontend
+  ports:
+    - port: 80
+      targetPort: 80

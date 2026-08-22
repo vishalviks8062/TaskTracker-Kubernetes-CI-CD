@@ -1,0 +1,35 @@
+# Serves the built Angular app and reverse-proxies /api/* to the backend
+# (see frontend/nginx.conf.template). 2 replicas behind the LoadBalancer
+# Service in 10-frontend-service.yaml for external access.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: kubecontainer01.azurecr.io/tasktracker-f:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: BACKEND_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: tasktracker-config
+                  key: BACKEND_URL
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi

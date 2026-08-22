@@ -1,0 +1,11 @@
+<article class="card" [class.done]="task.done">
+  <div class="card-top">
+    <input type="checkbox" [checked]="task.done" (change)="toggleDone.emit()" />
+    <h3>{{ task.title }}</h3>
+    <button class="remove" (click)="remove.emit()" title="Delete task">&times;</button>
+  </div>
+  <p class="description" *ngIf="task.description">{{ task.description }}</p>
+  <select class="bucket-select" [value]="task.bucketId" (change)="onBucketChange($event)">
+    <option *ngFor="let b of buckets" [value]="b.id">{{ b.name }}</option>
+  </select>
+</article>

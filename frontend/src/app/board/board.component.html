@@ -1,0 +1,32 @@
+<main class="board-wrap">
+  <div class="board-header">
+    <h1>Your Board</h1>
+    <form (ngSubmit)="addBucket()" class="add-bucket-form">
+      <input
+        type="text"
+        [(ngModel)]="newBucketName"
+        name="bucketName"
+        placeholder="New bucket name (e.g. Market)"
+        autocomplete="off"
+      />
+      <button type="submit">+ Add bucket</button>
+    </form>
+  </div>
+
+  <p *ngIf="error" class="error">{{ error }}</p>
+  <p *ngIf="loading">Loading...</p>
+
+  <div class="board" *ngIf="!loading">
+    <app-bucket-column
+      *ngFor="let bucket of buckets"
+      [bucket]="bucket"
+      [allBuckets]="buckets"
+      (changed)="refresh()"
+      (deleteBucket)="deleteBucket($event)"
+    ></app-bucket-column>
+
+    <p *ngIf="buckets.length === 0" class="empty">
+      No buckets yet — create one above (e.g. "Market", "Library") to start organizing tasks.
+    </p>
+  </div>
+</main>

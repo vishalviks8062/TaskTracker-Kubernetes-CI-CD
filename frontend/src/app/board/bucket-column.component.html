@@ -1,0 +1,27 @@
+<section class="column">
+  <header class="column-header">
+    <h2>{{ bucket.name }}</h2>
+    <span class="count">{{ bucket.tasks.length }}</span>
+    <button class="delete-bucket" (click)="deleteBucket.emit(bucket.id)" title="Delete bucket">&times;</button>
+  </header>
+
+  <app-task-card
+    *ngFor="let task of bucket.tasks"
+    [task]="task"
+    [buckets]="allBuckets"
+    (toggleDone)="toggleDone(task)"
+    (move)="moveTask(task, $event)"
+    (remove)="removeTask(task)"
+  ></app-task-card>
+
+  <button class="add-task-toggle" *ngIf="!showAddForm" (click)="showAddForm = true">+ Add task</button>
+
+  <form class="add-task-form" *ngIf="showAddForm" (ngSubmit)="addTask()">
+    <input type="text" [(ngModel)]="newTitle" name="title" placeholder="Task title" autocomplete="off" />
+    <textarea [(ngModel)]="newDescription" name="description" placeholder="Description (optional)" rows="2"></textarea>
+    <div class="add-task-actions">
+      <button type="submit">Add</button>
+      <button type="button" (click)="showAddForm = false">Cancel</button>
+    </div>
+  </form>
+</section>

@@ -1,0 +1,13 @@
+# Non-sensitive configuration shared by the backend and frontend Pods.
+# Anything in a ConfigMap is plain text and readable by anyone with get
+# access to it in this namespace, so credentials never go here — those
+# live in 02-secret.yaml instead.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tasktracker-config
+data:
+  DB_HOST: postgres-service          # DNS name of the Postgres ClusterIP Service (Kubernetes gives every Service a cluster-DNS name)
+  DB_PORT: "5432"
+  DB_NAME: tasktracker
+  BACKEND_URL: http://backend-service:8080   # used by the frontend's nginx to reverse-proxy /api

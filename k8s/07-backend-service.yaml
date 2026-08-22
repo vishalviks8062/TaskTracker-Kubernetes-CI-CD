@@ -1,0 +1,14 @@
+# ClusterIP: internal-only. The frontend's nginx reverse-proxies to this
+# Service (via the BACKEND_URL value in the ConfigMap) instead of the API
+# being exposed straight to the internet — one less thing on the public
+# internet that needs its own auth/rate-limiting/TLS story.
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+spec:
+  selector:
+    app: backend
+  ports:
+    - port: 8080
+      targetPort: 8080

@@ -1,0 +1,24 @@
+<div class="auth-wrap">
+  <form (ngSubmit)="submit()" class="auth-form">
+    <h1>Register</h1>
+    <input
+      type="text"
+      [(ngModel)]="username"
+      name="username"
+      placeholder="Choose a username"
+      autocomplete="username"
+      required
+    />
+    <input
+      type="password"
+      [(ngModel)]="password"
+      name="password"
+      placeholder="Password (min 6 characters)"
+      autocomplete="new-password"
+      required
+    />
+    <p *ngIf="error" class="error">{{ error }}</p>
+    <button type="submit">Create account</button>
+    <p class="switch">Already have an account? <a routerLink="/login">Log in</a></p>
+  </form>
+</div>

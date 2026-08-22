@@ -1,0 +1,42 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: tasktracker
+      POSTGRES_USER: tasktracker
+      POSTGRES_PASSWORD: tasktracker_pw
+    ports:
+      - "5433:5432"   # host 5433 -> container 5432 (5432 was already taken on the host); `psql -h localhost -p 5433`
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tasktracker"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: tasktracker
+      DB_USER: tasktracker
+      DB_PASSWORD: tasktracker_pw
+    ports:
+      - "8090:8080"   # host 8090 -> container 8080 (8080/8081 were already taken on the host)
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    environment:
+      BACKEND_URL: http://backend:8080   # container-to-container DNS name in the compose network
+    ports:
+      - "4210:80"   # host 4210 -> container 80 (4200 was already taken on the host)
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

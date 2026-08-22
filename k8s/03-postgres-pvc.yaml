@@ -1,0 +1,14 @@
+# Requests persistent storage for Postgres so data survives Pod restarts
+# and rescheduling. No storageClassName is set, so AKS uses its default
+# StorageClass (Azure Disk), which dynamically provisions a real Azure
+# Managed Disk to back this claim the first time it's used.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce   # an Azure Disk can only be attached read-write to one node at a time
+  resources:
+    requests:
+      storage: 1Gi
